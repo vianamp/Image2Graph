@@ -1,24 +1,20 @@
 // Image2Graph
 // Image operations based on graphs.
-// Matheus Viana, vianamp@gmail.com
+// Matheus Viana, vianamp@gmail.com [25.01.2016]
 
 #include "_Im2Graph.h"
 #include "_InteractionCallBack.h"
 
 int main(int argc, char *argv[]) {
 
-  vtkSmartPointer<vtkImageViewer2> imageViewer = vtkSmartPointer<vtkImageViewer2>::New();
- 
-  std::string inputFilename = argv[1];
+  // Load image from command line
+  vtkSmartPointer<vtkTIFFReader> TIFFReader = vtkSmartPointer<vtkTIFFReader>::New();
+  TIFFReader -> SetFileName(argv[1]);
+  TIFFReader -> Update();
 
-  vtkSmartPointer<vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
-  tiffReader -> SetFileName(inputFilename.c_str());
-  tiffReader -> Update();
+  vtkSmartPointer<vtkImageData> Image = TIFFReader -> GetOutput(); 
 
-  vtkSmartPointer<vtkImageData> Image = tiffReader -> GetOutput();
-
-  // Create the graph
-
+  // Create the image-graph converter
   vtkSmartPointer<vtkMutableUndirectedGraph> G = vtkSmartPointer<vtkMutableUndirectedGraph>::New();
   _Im2Graph *Im2Graph = new _Im2Graph();
   Im2Graph -> SetKernelSize(8);
@@ -27,43 +23,47 @@ int main(int argc, char *argv[]) {
   Im2Graph -> CreateInternaliGraphInstance(G);
   Im2Graph -> CopyScalarVector(G->GetEdgeData()->GetArray("GrayLevel"));
 
-  // Visualization
+  // Generating visualization and interactor
+  vtkSmartPointer<vtkImageViewer2> ImViewer = vtkSmartPointer<vtkImageViewer2>::New();
+  ImViewer -> SetInputData(Image);
 
-  imageViewer -> SetInputData(Image);
+  // vtkPropPicker is used to pick an actor/prop given a selection point (in display coordinates) and a renderer. This class uses graphics hardware/rendering system to pick rapidly (as compared to using ray casting as does vtkCellPicker and vtkPointPicker). This class determines the actor/prop and pick position in world coordinates; point and cell ids are not determined.
+  vtkSmartPointer<vtkPropPicker> PropPicker = vtkSmartPointer<vtkPropPicker>::New();
+  PropPicker -> PickFromListOn();
 
-  vtkSmartPointer<vtkPropPicker> propPicker = vtkSmartPointer<vtkPropPicker>::New();
-  propPicker -> PickFromListOn();
-
-  vtkImageActor *imageActor = imageViewer -> GetImageActor();
-  imageActor -> SetOpacity(0.5);
-  propPicker -> AddPickList(imageActor);
-
-  imageActor -> InterpolateOff();
+  vtkImageActor *ImActor = ImViewer -> GetImageActor();
+  ImActor -> SetOpacity(0.5);
+  ImActor -> InterpolateOff();
+  PropPicker -> AddPickList(ImActor);
 
   vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-  imageViewer -> SetupInteractor(renderWindowInteractor);
-  imageViewer -> SetSize(600, 600);
+  ImViewer -> SetupInteractor(renderWindowInteractor);
+  ImViewer -> SetSize(600, 600);
 
-  vtkRenderer *renderer = imageViewer -> GetRenderer();
-  renderer -> ResetCamera();
-  renderer -> GradientBackgroundOn();
-  renderer -> SetBackground(0.5, 0.5, 0.5);
-  renderer -> SetBackground2(0.2, 0.2, 0.2);
+  vtkRenderer *Renderer = ImViewer -> GetRenderer();
+  Renderer -> ResetCamera();
+  Renderer -> GradientBackgroundOn();
+  Renderer -> SetBackground(0.5, 0.5, 0.5);
+  Renderer -> SetBackground2(0.2, 0.2, 0.2);
 
-  vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-  cornerAnnotation -> SetLinearFontScaleFactor(2);
-  cornerAnnotation -> SetNonlinearFontScaleFactor(1);
-  cornerAnnotation -> SetMaximumFontSize(20);
-  cornerAnnotation -> SetText(0, "Off Image");
-  cornerAnnotation -> GetTextProperty() -> SetColor(1.0,0.7,0.0);
+  // This is an annotation object that manages four text actors / mappers to provide annotation in the four corners of a viewport.
+  vtkSmartPointer<vtkCornerAnnotation> CAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
+  CAnnotation -> SetLinearFontScaleFactor(2);
+  CAnnotation -> SetNonlinearFontScaleFactor(1);
+  CAnnotation -> SetMaximumFontSize(20);
+  CAnnotation -> SetText(0,"Off Image");
+  CAnnotation -> GetTextProperty() -> SetColor(1.0,0.7,0.0);
 
-  imageViewer -> GetRenderer() -> AddViewProp(cornerAnnotation);
+  ImViewer -> GetRenderer() -> AddViewProp(CAnnotation);
 
-  vtkSmartPointer<_InteractionCallBack> callback = vtkSmartPointer<_InteractionCallBack>::New();
-  callback -> Initialize(propPicker,cornerAnnotation,imageViewer,Im2Graph);
+  // Local class _InteractionCallBack. Extracted from example:
+  // http://www.vtk.org/Wiki/VTK/Examples/Cxx/Images/PickPixel2
+  vtkSmartPointer<_InteractionCallBack> CallBack = vtkSmartPointer<_InteractionCallBack>::New();
+  CallBack -> Initialize(PropPicker,CAnnotation,ImViewer,Im2Graph);
 
-  vtkInteractorStyleImage *imageStyle = imageViewer -> GetInteractorStyle();
-  imageStyle -> AddObserver(vtkCommand::LeftButtonPressEvent, callback);
+  // vtkInteractorStyleImage allows the user to interactively manipulate (rotate, pan, zoom etc.)
+  vtkInteractorStyleImage *imageStyle = ImViewer -> GetInteractorStyle();
+  imageStyle -> AddObserver(vtkCommand::LeftButtonPressEvent, CallBack);
 
   renderWindowInteractor -> Initialize();
   renderWindowInteractor -> Start();
