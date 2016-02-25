@@ -7,6 +7,10 @@
 
 int main(int argc, char *argv[]) {
 
+  #ifdef DEBUG
+      printf("Debug mode in [on]\n");
+  #endif
+
   // Load image from command line
   vtkSmartPointer<vtkTIFFReader> TIFFReader = vtkSmartPointer<vtkTIFFReader>::New();
   TIFFReader -> SetFileName(argv[1]);

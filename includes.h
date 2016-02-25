@@ -52,3 +52,7 @@
 // iGraph
 
 #include <igraph/igraph.h>
+
+// MACROS
+
+#define DEBUG
