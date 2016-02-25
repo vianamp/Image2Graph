@@ -1,58 +1,7 @@
 #ifndef _IM2GRAPH_H
 #define _IM2GRAPH_H
 
-#include <list>
-#include <cmath>
-#include <cstdio>
-#include <random>
-#include <cstdlib>
-#include <cstring>
-#include <algorithm>
-
-#include <vtkSmartPointer.h>
-#include <vtkMutableUndirectedGraph.h>
-#include <vtkCircularLayoutStrategy.h>
-#include <vtkDataSetAttributes.h>
-#include <vtkDoubleArray.h>
-#include <vtkGraphLayoutView.h>
-#include <vtkIntArray.h>
-#include <vtkMutableUndirectedGraph.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkSimple2DLayoutStrategy.h>
-#include <vtkPoints.h>
-#include <vtkVersion.h>
-#include <vtkAssemblyPath.h>
-#include <vtkCell.h>
-#include <vtkLine.h>
-#include <vtkPolyLine.h>
-#include <vtkCommand.h>
-#include <vtkCornerAnnotation.h>
-#include <vtkImageActor.h>
-#include <vtkImageData.h>
-#include <vtkImageViewer2.h>
-#include <vtkInteractorStyleImage.h>
-#include <vtkTIFFReader.h>
-#include <vtkPointData.h>
-#include <vtkDataArray.h>
-#include <vtkUnsignedShortArray.h>
-#include <vtkDoubleArray.h>
-#include <vtkTIFFWriter.h>
-#include <vtkPropPicker.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkSmartPointer.h>
-#include <vtkTextProperty.h>
-#include <vtkImageNoiseSource.h>
-#include <vtkImageCast.h>
-#include <vtkMath.h>
-#include <vtkEdgeListIterator.h>
-#include <vtkVertexListIterator.h>
-#include <vtkGraphToPolyData.h>
-#include <vtkDijkstraGraphGeodesicPath.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
-#include <igraph/igraph.h>
+#include "includes.h"
 
 class _Im2Graph {
 
