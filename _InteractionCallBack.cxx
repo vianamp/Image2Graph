@@ -1,12 +1,14 @@
 #include "_Im2Graph.h"
 #include "_InteractionCallBack.h"
 
+  // Callback initialization
   void _InteractionCallBack::Initialize(vtkPropPicker *picker, vtkCornerAnnotation *annotation, vtkImageViewer2 *viewer, _Im2Graph *im2g) {
     this -> Picker = picker;
     this -> Viewer = viewer;
     this -> Im2Graph = im2g;
     this -> Annotation = annotation;
 
+    // Add all image points to polydata
     double r[3];
     Lines = vtkPolyData::New();
     LinesArray = vtkCellArray::New();
@@ -17,15 +19,19 @@
     }
     Lines -> SetPoints(Points);
 
+    // Create PolyData visualization
     vtkSmartPointer<vtkPolyDataMapper> LinesMapper =  vtkSmartPointer<vtkPolyDataMapper>::New();
     LinesMapper -> SetInputData(Lines);
     vtkSmartPointer<vtkActor> LinesActor = vtkSmartPointer<vtkActor>::New();
     LinesActor -> SetMapper(LinesMapper);
     LinesActor -> GetProperty() -> SetColor(1,0,0);
     LinesActor -> GetProperty() -> SetLineWidth(5);
+
+    // Add polydata to randerer
     this -> Viewer -> GetRenderer() -> AddActor(LinesActor);
   }
-   
+  
+  // Setting callback function for user interaction
   void _InteractionCallBack::Execute(vtkObject *, unsigned long vtkNotUsed(event), void*) {
 
     vtkRenderWindowInteractor *interactor = this -> Viewer -> GetRenderWindow() -> GetInteractor();
@@ -39,7 +45,7 @@
     vtkAssemblyPath *path = this -> Picker -> GetPath();
     bool validPick = false;
    
-    if (path) {
+    if ( path ) {
       vtkCollectionSimpleIterator sit;
       path -> InitTraversal(sit);
       vtkAssemblyNode *node;
@@ -51,7 +57,7 @@
       }
     }
    
-    if (!validPick) {
+    if ( !validPick ) {
       this -> Annotation -> SetText(0, "Off Image");
       interactor -> Render();
       return;
