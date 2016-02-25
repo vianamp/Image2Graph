@@ -1,3 +1,7 @@
+// Image2Graph
+// Image operations based on graphs.
+// Matheus Viana, vianamp@gmail.com
+
 #include <list>
 #include <cmath>
 #include <cstdio>
