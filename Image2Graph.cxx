@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
   // Local class _InteractionCallBack. Extracted from example:
   // http://www.vtk.org/Wiki/VTK/Examples/Cxx/Images/PickPixel2
   vtkSmartPointer<_InteractionCallBack> CallBack = vtkSmartPointer<_InteractionCallBack>::New();
-  CallBack -> Initialize(PropPicker,CAnnotation,ImViewer,Im2Graph);
+  CallBack -> Initialize(PropPicker,CAnnotation,ImViewer,G,Im2Graph,1);
 
   // vtkInteractorStyleImage allows the user to interactively manipulate (rotate, pan, zoom etc.)
   vtkInteractorStyleImage *imageStyle = ImViewer -> GetInteractorStyle();

@@ -19,6 +19,8 @@ class _Im2Graph {
 
     int ProbeImageAndAssignToGraph(vtkImageData *Image, vtkMutableUndirectedGraph *G, const char Name[]);
 
+    int UpdateWeights(vtkImageData *Image, vtkMutableUndirectedGraph *G, std::vector<vtkIdType> Buffer);
+
     int CreateInternaliGraphInstance(vtkMutableUndirectedGraph *G);
 
     int CopyScalarVector(vtkDataArray *Vector);

@@ -104,6 +104,46 @@
     return EXIT_SUCCESS;
   }
 
+  // Update graph weights according to change sin the probing image
+  int _Im2Graph::UpdateWeights(vtkImageData *Image, vtkMutableUndirectedGraph *G, std::vector<vtkIdType> Buffer) {
+    
+    // Iterators for edges
+    vtkSmartPointer<vtkOutEdgeIterator> eit = vtkSmartPointer<vtkOutEdgeIterator>::New();
+
+    // Scalar array for edges
+    vtkSmartPointer<vtkDataArray> We = G -> GetEdgeData() -> GetArray("GrayLevel");
+
+    // Scalar array for vertices
+    vtkSmartPointer<vtkDataArray> Wv = G -> GetVertexData() -> GetArray("GrayLevel");
+
+    #ifdef DEBUG
+        sort(Buffer.begin(),Buffer.end());
+        unique(Buffer.begin(),Buffer.end());
+        Buffer.erase(unique(Buffer.begin(),Buffer.end()),Buffer.end());
+        printf("\tBuffer size: %ld\n",(long int)Buffer.size());
+    #endif
+   
+    // Updating
+    double vi, vj;
+    vtkOutEdgeType e;
+    for (int i = 0; i < Buffer.size(); i++) {
+      vi = Image -> GetPointData() -> GetScalars() -> GetTuple1(Buffer[i]);
+      Wv -> SetTuple1(Buffer[i],vi);
+      G -> GetOutEdges(Buffer[i],eit); 
+      while( eit->HasNext() ) {
+        e = eit -> Next();
+        vi = Image -> GetPointData() -> GetScalars() -> GetTuple1(Buffer[i]);
+        vj = Image -> GetPointData() -> GetScalars() -> GetTuple1(e.Target);
+        We -> SetTuple1(e.Id, 0.5 * (vi+vj) );
+        VECTOR(Weight)[e.Id] = 0.5 * (vi+vj);
+      }
+    }
+    We -> Modified();
+    Wv -> Modified();
+
+    return EXIT_SUCCESS;
+  }
+
   // Create an internal instance of iGraph
   int _Im2Graph::CreateInternaliGraphInstance(vtkMutableUndirectedGraph *G) {
 
