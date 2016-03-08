@@ -115,7 +115,7 @@
         for (int j = 0; j < _ssdx.size(); j++) {
           id = image -> FindPoint(pos[0]+_ssdx[j],pos[1]+_ssdy[j],pos[2]);
           if (id > 0) {
-            //image -> GetPointData() -> GetScalars() -> SetTuple1(id,65535);
+            image -> GetPointData() -> GetScalars() -> SetTuple1(id,65535);
             Buffer.push_back(id);
           }
         }
