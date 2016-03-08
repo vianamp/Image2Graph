@@ -172,8 +172,10 @@
 
   // Assign the valus of Vector to the internal vector Weight
   int _Im2Graph::CopyScalarVector(vtkDataArray *Vector) {
-    igraph_vector_destroy(&Weight);
-    igraph_vector_init(&Weight,igraph_ecount(&iG));
+    if (igraph_vector_size(&Weight))
+      igraph_vector_destroy(&Weight);
+    else
+      igraph_vector_init(&Weight,igraph_ecount(&iG));
     for (igraph_integer_t i = 0; i < igraph_ecount(&iG); i++) {
       VECTOR(Weight)[i] = Vector -> GetTuple1((vtkIdType)i);
     }

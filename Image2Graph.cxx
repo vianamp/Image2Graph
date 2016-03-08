@@ -24,8 +24,26 @@ int main(int argc, char *argv[]) {
   Im2Graph -> SetKernelSize(8);
   Im2Graph -> CreateUnGraphTopologyFrom2DImage(Image,G);
   Im2Graph -> ProbeImageAndAssignToGraph(Image,G,"GrayLevel");
+
+  #ifdef DEBUG
+      printf("Creating iGraph Structure...\n");
+  #endif
+
   Im2Graph -> CreateInternaliGraphInstance(G);
+
+  #ifdef DEBUG
+      printf("\tDone.\n");
+  #endif
+
+  #ifdef DEBUG
+      printf("Copying scalar vector...\n");
+  #endif
+
   Im2Graph -> CopyScalarVector(G->GetEdgeData()->GetArray("GrayLevel"));
+
+  #ifdef DEBUG
+      printf("\tDone.\n");
+  #endif
 
   // Generating visualization and interactor
   vtkSmartPointer<vtkImageViewer2> ImViewer = vtkSmartPointer<vtkImageViewer2>::New();
