@@ -29,6 +29,7 @@
   // GRAPH
   #include <vtkAssemblyPath.h>
   #include <vtkGraphLayoutView.h>
+  #include <vtkOutEdgeIterator.h>
   #include <vtkEdgeListIterator.h>
   #include <vtkVertexListIterator.h>
   #include <vtkMutableUndirectedGraph.h>

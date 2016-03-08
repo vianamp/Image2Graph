@@ -2,11 +2,21 @@
 #include "_InteractionCallBack.h"
 
   // Callback initialization
-  void _InteractionCallBack::Initialize(vtkPropPicker *picker, vtkCornerAnnotation *annotation, vtkImageViewer2 *viewer, _Im2Graph *im2g) {
+  void _InteractionCallBack::Initialize(vtkPropPicker *picker, vtkCornerAnnotation *annotation, vtkImageViewer2 *viewer, vtkMutableUndirectedGraph *G, _Im2Graph *im2g, int wsize) {
+    this -> _wsize = wsize;
     this -> Picker = picker;
     this -> Viewer = viewer;
+    this -> vtkG = G;
     this -> Im2Graph = im2g;
     this -> Annotation = annotation;
+
+    // Create _ss masks
+    for (int i = -_wsize; i <= _wsize; i++) {
+      for (int j = -_wsize; j <= _wsize; j++) {
+        _ssdx.push_back(i);
+        _ssdy.push_back(j);
+      }
+    }
 
     // Add all image points to polydata
     double r[3];
@@ -93,9 +103,22 @@
       vtkIdType node_j = ControlPoints[ControlPoints.size()-2];
       Im2Graph -> ShortestPath(node_i,node_j,&Path);
 
+      //Smooth Path here?
+
+      #ifdef DEBUG
+          printf("Change pixels values...\n");
+      #endif
+
       LinesArray -> InsertNextCell(Path.size());
       for (int i = 0; i < Path.size(); i++) {
-        image -> GetPointData() -> GetScalars() -> SetTuple1(Path[i],65535);
+        image -> GetPoint(Path[i],pos);
+        for (int j = 0; j < _ssdx.size(); j++) {
+          id = image -> FindPoint(pos[0]+_ssdx[j],pos[1]+_ssdy[j],pos[2]);
+          if (id > 0) {
+            image -> GetPointData() -> GetScalars() -> SetTuple1(id,65535);
+            Buffer.push_back(id);
+          }
+        }
         LinesArray -> InsertCellPoint(Path[i]);
       }
       LinesArray -> Modified();
@@ -107,6 +130,13 @@
           printf("\t#segments = %lld\n",Lines->GetNumberOfLines());
           printf("\tlength[%d,%d] = %ld\n",(int)node_i,(int)node_j,Path.size());
       #endif
+
+      #ifdef DEBUG
+          printf("Updating graph weights...\n");
+      #endif
+
+      Im2Graph -> UpdateWeights(image,vtkG,Buffer);
+      Buffer.clear();
 
       Path.clear();
     }

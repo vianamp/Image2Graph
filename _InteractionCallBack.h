@@ -20,13 +20,16 @@ class _InteractionCallBack : public vtkCommand {
 
   private:
 
+    int _wsize;
     vtkPolyData *Lines;
     vtkCellArray *LinesArray;
     _Im2Graph *Im2Graph;
     vtkPropPicker *Picker;
     vtkImageViewer2 *Viewer;
     vtkCornerAnnotation *Annotation;
-    std::vector<vtkIdType> ControlPoints;
+    vtkMutableUndirectedGraph *vtkG;
+    std::vector<int> _ssdx, _ssdy;
+    std::vector<vtkIdType> ControlPoints, Buffer;
 
   public:
 
@@ -46,7 +49,7 @@ class _InteractionCallBack : public vtkCommand {
       return new _InteractionCallBack;
     }
    
-    void Initialize(vtkPropPicker *picker, vtkCornerAnnotation *annotation, vtkImageViewer2 *viewer, _Im2Graph *im2g);
+    void Initialize(vtkPropPicker *picker, vtkCornerAnnotation *annotation, vtkImageViewer2 *viewer, vtkMutableUndirectedGraph *G, _Im2Graph *im2g, int wsize);
 
     virtual void Execute(vtkObject *, unsigned long vtkNotUsed(event), void*);
 
